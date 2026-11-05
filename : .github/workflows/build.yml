@@ -1,30 +1,19 @@
-name: Build PocketQuest
-
+name: Build APK
 on:
   workflow_dispatch:
   push:
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - name: Build with Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
         with:
-          python-version: '3.11'
-
-      - name: Install Pygbag
-        run: pip install pygbag
-
-      - name: Build game
-        run: python -m pygbag --build .
-
-      - name: Upload web game
-        uses: actions/upload-artifact@v4
+          command: buildozer android debug
+          buildozer_version: stable
+      - uses: actions/upload-artifact@v4
         with:
-          name: PocketQuest-Web
-          path: build/web/
+          name: package
+          path: ${{ steps.buildozer.outputs.filename }}
